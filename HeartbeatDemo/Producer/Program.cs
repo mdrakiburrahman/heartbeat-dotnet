@@ -13,8 +13,8 @@ namespace Producer
         {
             // Parse args for 2 values:
             //
-            // 1. Arc SQL Server name: -arcee
-            // 2. Event Hub connection string: -ehcs
+            // 1. Arc SQL Server name
+            // 2. Event Hub connection string
             //
             if (args.Length != 2)
             {
