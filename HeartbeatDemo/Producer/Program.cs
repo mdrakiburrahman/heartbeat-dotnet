@@ -8,6 +8,7 @@ namespace Producer
     public class Program
     {
         public const string heartbeatEventHubName = "heartbeat";
+        public const int heartbeatIntervalInMilliSeconds = 500;
 
         static async Task Main(string[] args)
         {
@@ -41,6 +42,7 @@ namespace Producer
                 eventHubName: heartbeatEventHubName
             );
 
+            int eventCount = 1;
             while (!cts.Token.IsCancellationRequested)
             {
                 var messageBody = new { machine_name = arcSqlServerName, machine_time = DateTime.UtcNow };
@@ -48,10 +50,12 @@ namespace Producer
                     JsonConvert.SerializeObject(messageBody)
                 );
 
-                await producerClient.SendAsync(new List<EventData> { new EventData(messageBytes) });
+                Console.WriteLine($".");
 
-                Console.WriteLine($"Sending heartbeat: {arcSqlServerName}...");
-                await Task.Delay(1000);
+                await producerClient.SendAsync(new List<EventData> { new EventData(messageBytes) });
+                eventCount++;
+
+                await Task.Delay(heartbeatIntervalInMilliSeconds);
             }
 
             // Close the clients
