@@ -43,7 +43,7 @@ namespace Producer
 
             while (!cts.Token.IsCancellationRequested)
             {
-                var messageBody = new { name = arcSqlServerName, heartbeatTime = DateTime.UtcNow };
+                var messageBody = new { machine_name = arcSqlServerName, machine_time = DateTime.UtcNow };
                 byte[] messageBytes = Encoding.UTF8.GetBytes(
                     JsonConvert.SerializeObject(messageBody)
                 );
