@@ -58,7 +58,10 @@ namespace Producer
             //
             await producerClient.CloseAsync();
 
-            Console.WriteLine("Done.");
+            Console.BackgroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine($"{arcSqlServerName} going offline.");
+            Console.ResetColor();
         }
     }
 }
