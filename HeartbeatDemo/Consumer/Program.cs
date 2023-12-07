@@ -18,7 +18,7 @@ namespace Consumer
         {
             // Parse args for 2 values:
             //
-            // 1. Blobk checkpoint connection string
+            // 1. Blob checkpoint connection string
             // 2. Event Hub connection string
             //
             if (args.Length != 2)
