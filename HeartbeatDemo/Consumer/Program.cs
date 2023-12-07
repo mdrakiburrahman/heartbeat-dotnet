@@ -18,7 +18,7 @@ namespace Consumer
         {
             // Parse args for 2 values:
             //
-            // 1. Blobk checkpoint connection string
+            // 1. Blob checkpoint connection string
             // 2. Event Hub connection string
             //
             if (args.Length != 2)
@@ -125,17 +125,21 @@ namespace Consumer
             if (machineStatusPayload == null)
                 return;
 
-            if (machineStatusPayload.Status == "Initializing")
+            if (machineStatusPayload.Status == "ExtensionInitializing")
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
             }
-            else if (machineStatusPayload.Status == "Online")
+            else if (machineStatusPayload.Status == "InstanceOnline")
             {
                 Console.ForegroundColor = ConsoleColor.Green;
             }
-            else if (machineStatusPayload.Status == "Offline")
+            else if (machineStatusPayload.Status == "InstanceOffline")
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+            }
+            else if (machineStatusPayload.Status == "ExtensionOffline")
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
             }
 
             Console.WriteLine(
