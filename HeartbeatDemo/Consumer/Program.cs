@@ -1,12 +1,9 @@
-﻿using Azure.Messaging.EventHubs.Consumer;
-using Azure.Messaging.EventHubs;
-using Azure.Storage.Blobs;
+﻿using Azure.Messaging.EventHubs;
+using Azure.Messaging.EventHubs.Consumer;
 using Azure.Messaging.EventHubs.Processor;
-using Azure.Messaging.EventHubs.Producer;
-using Newtonsoft.Json.Linq;
+using Azure.Storage.Blobs;
 using System.Text;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
 
 namespace Consumer
 {
@@ -104,11 +101,11 @@ namespace Consumer
         )
         {
             string payload = Encoding.UTF8.GetString(eventArgs.Data.Body.ToArray());
-            MachineStatus? machineStatusPayload =
-                System.Text.Json.JsonSerializer.Deserialize<MachineStatus>(payload);
+            InstanceStatus? instanceStatusPayload =
+                System.Text.Json.JsonSerializer.Deserialize<InstanceStatus>(payload);
 
-            PrettyPrintMachineStatus(
-                machineStatusPayload,
+            PrettyPrintInstanceStatus(
+                instanceStatusPayload,
                 eventArgs.Data.SequenceNumber,
                 consumerClient
             );
@@ -116,34 +113,34 @@ namespace Consumer
             return Task.CompletedTask;
         }
 
-        static void PrettyPrintMachineStatus(
-            MachineStatus machineStatusPayload,
+        static void PrettyPrintInstanceStatus(
+            InstanceStatus instanceStatusPayload,
             long offset,
             EventHubConsumerClient consumerClient
         )
         {
-            if (machineStatusPayload == null)
+            if (instanceStatusPayload == null)
                 return;
 
-            if (machineStatusPayload.Status == "ExtensionInitializing")
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-            }
-            else if (machineStatusPayload.Status == "InstanceOnline")
+            if (instanceStatusPayload.HeartbeatStatus == "Healthy" && instanceStatusPayload.HealthStatus == "Healthy")
             {
                 Console.ForegroundColor = ConsoleColor.Green;
             }
-            else if (machineStatusPayload.Status == "InstanceOffline")
+            else if (instanceStatusPayload.HeartbeatStatus == "Unhealthy")
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            }
+            else if (instanceStatusPayload.HealthStatus == "Unhealthy")
             {
                 Console.ForegroundColor = ConsoleColor.Red;
             }
-            else if (machineStatusPayload.Status == "ExtensionOffline")
+            else
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
             }
 
             Console.WriteLine(
-                $"[{offset}/{GetNumEvents(consumerClient).Result}] Machine {machineStatusPayload.MachineName} is {machineStatusPayload.Status} at {machineStatusPayload.LastStatusChangeTime}"
+                $"[{offset}/{GetNumEvents(consumerClient).Result}] {instanceStatusPayload.LastStatusChangeTime} | Instance {instanceStatusPayload.InstanceId} | Heartbeat: {instanceStatusPayload.HeartbeatStatus}  | Engine Health: {instanceStatusPayload.HealthStatus}"
             );
             Console.ResetColor();
         }
@@ -170,16 +167,22 @@ namespace Consumer
             await Task.Delay(-1, cancellationToken);
         }
 
-        public class MachineStatus
+        public class InstanceStatus
         {
-            [JsonPropertyName("machine_name")]
-            public string MachineName { get; set; }
+            [JsonPropertyName("instanceId")]
+            public string InstanceId { get; set; }
 
-            [JsonPropertyName("last_status_change_time")]
+            [JsonPropertyName("lastStatusChangeTime")]
             public DateTime LastStatusChangeTime { get; set; }
 
-            [JsonPropertyName("status")]
-            public string Status { get; set; }
+            [JsonPropertyName("heartbeatStatus")]
+            public string HeartbeatStatus { get; set; }
+
+            [JsonPropertyName("healthStatus")]
+            public string HealthStatus { get; set; }
+
+            [JsonPropertyName("healthMessage")]
+            public string HealthMessage { get; set; }
         }
     }
 }
