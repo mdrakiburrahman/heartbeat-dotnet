@@ -59,20 +59,21 @@ namespace Producer
                 var response = await httpClient.GetAsync(arcSqlServerHealthProbeEndpoint);
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var healthzContent = JsonConvert.DeserializeObject<ApiResponse>(responseContent);
-                byte[] messageBytes = Encoding.UTF8.GetBytes(
-                    JsonConvert.SerializeObject(responseContent)
-                );
+                byte[] messageBytes = Encoding.UTF8.GetBytes(responseContent);
 
+                string text;
                 if (healthzContent.InstanceStatus.InstanceReachable)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
+                    text = "Healthy";
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
+                    text = "Unhealthy";
                 }
 
-                Console.WriteLine($".");
+                Console.WriteLine(text);
                 Console.ResetColor();
 
                 await producerClient.SendAsync(new List<EventData> { new EventData(messageBytes) });
