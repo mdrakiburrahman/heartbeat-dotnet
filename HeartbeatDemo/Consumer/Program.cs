@@ -129,11 +129,11 @@ namespace Consumer
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
             }
-            else if (machineStatusPayload.Status == "Online")
+            else if (machineStatusPayload.Status == "Healthy")
             {
                 Console.ForegroundColor = ConsoleColor.Green;
             }
-            else if (machineStatusPayload.Status == "Offline")
+            else if (machineStatusPayload.Status == "Unhealthy")
             {
                 Console.ForegroundColor = ConsoleColor.Red;
             }
